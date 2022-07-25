@@ -13,7 +13,7 @@ LOGIN_SCREEN () {
   fi
 
   # Ask for username
-  echo -e "Enter your username:"
+  echo -e "\nEnter your username:"
   read USERNAME
 
   # If username less than 22 characters
@@ -37,14 +37,18 @@ LOGIN_SCREEN () {
 
     # Add to database
     ADD_USER_RESULT=$($PSQL "INSERT INTO users(name) VALUES('$USERNAME')")
+
+    # Fetch new user_id
+    USER_ID=$($PSQL "SELECT user_id FROM users WHERE name = '$USERNAME'")
     
     # Go to game
     GAME "$USER_ID" "$USERNAME" 
+    return
 
 
   fi
   # Fetch games_played and best number of guesses from database
-  USER_INFORMATION=$($PSQL "SELECT COUNT(game_id), MIN(number_guesses) FROM users INNER JOIN games USING(user_id) WHERE user_id = 2")
+  USER_INFORMATION=$($PSQL "SELECT COUNT(game_id), MIN(number_guesses) FROM users INNER JOIN games USING(user_id) WHERE user_id = $USER_ID")
   
   IFS="|" read -r GAMES_PLAYED BEST_NUMBER_GUESSES <<< $USER_INFORMATION
 
@@ -81,7 +85,7 @@ GAME () {
     then 
 
       # Print error message
-      That is not an integer, guess again:
+      echo -e "\nThat is not an integer, guess again:"
 
       # Ask for input again
       continue
@@ -111,6 +115,9 @@ GAME () {
 
     # Display congrats message and exit the loop
     echo -e "\nYou guessed it in $(echo $GUESSES | sed -E 's/^ *| *$//g') tries. The secret number was $(echo $NUMBER_TO_GUESS | sed -E 's/^ *| *$//g'). Nice job!"
+
+    # Add game to database
+    INSERT_GAME_RESULT=$($PSQL "INSERT INTO games(user_id, number_guesses) VALUES($USER_ID, $GUESSES)")
 
     break
   done
