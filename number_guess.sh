@@ -49,8 +49,10 @@ LOGIN_SCREEN () {
   IFS="|" read -r GAMES_PLAYED BEST_NUMBER_GUESSES <<< $USER_INFORMATION
 
   # Display user information
+  echo -e "\nWelcome back, $(echo $USERNAME | sed -E 's/^ *| *$//g')! You have played $(echo $GAMES_PLAYED | sed -E 's/^ *| *$//g') games, and your best game took $(echo $BEST_NUMBER_GUESSES | sed -E 's/^ *| *$//g') guesses."
 
   # Go to game
+  GAME "$USER_ID"
 }
 
 GAME () {
