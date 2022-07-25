@@ -42,13 +42,13 @@ LOGIN_SCREEN () {
     USER_ID=$($PSQL "SELECT user_id FROM users WHERE name = '$USERNAME'")
     
     # Go to game
-    GAME "$USER_ID" "$USERNAME" 
+    GAME "$USER_ID" "$USERNAME" "0" "0"
     return
 
 
   fi
   # Fetch games_played and best number of guesses from database
-  USER_INFORMATION=$($PSQL "SELECT COUNT(game_id), MIN(number_guesses) FROM users INNER JOIN games USING(user_id) WHERE user_id = $USER_ID")
+  USER_INFORMATION=$($PSQL "SELECT games_played, best_game FROM users WHERE user_id = $USER_ID")
   
   IFS="|" read -r GAMES_PLAYED BEST_NUMBER_GUESSES <<< $USER_INFORMATION
 
@@ -56,12 +56,14 @@ LOGIN_SCREEN () {
   echo -e "\nWelcome back, $(echo $USERNAME | sed -E 's/^ *| *$//g')! You have played $(echo $GAMES_PLAYED | sed -E 's/^ *| *$//g') games, and your best game took $(echo $BEST_NUMBER_GUESSES | sed -E 's/^ *| *$//g') guesses."
 
   # Go to game
-  GAME "$USER_ID" "$USERNAME"
+  GAME "$USER_ID" "$USERNAME" "$GAMES_PLAYED" "$BEST_NUMBER_GUESSES"
 }
 
 GAME () {
   USER_ID=$1
   USERNAME=$2
+  GAMES_PLAYED=$3
+  BEST_NUMBER_GUESSES=$4
   GUESSES=0
 
 
@@ -118,6 +120,17 @@ GAME () {
 
     # Add game to database
     INSERT_GAME_RESULT=$($PSQL "INSERT INTO games(user_id, number_guesses) VALUES($USER_ID, $GUESSES)")
+
+    # If number of games played is zero or this game has lower guesses
+    if [[ $GAMES_PLAYED = 0 ]] || [[ $GUESSES -lt $BEST_NUMBER_GUESSES ]]
+    then
+
+      # Update user's best_game
+      UPDATE_BEST_GAME_RESULT=$($PSQL "UPDATE users SET best_game = $GUESSES WHERE user_id = $USER_ID")
+    fi
+    # Insert incremented number of games to database
+    INCREMENT_NUMBER_GAMES=$($PSQL "UPDATE users SET games_played = games_played + 1 WHERE user_id = $USER_ID")
+    
 
     break
   done
