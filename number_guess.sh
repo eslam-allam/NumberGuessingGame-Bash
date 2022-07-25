@@ -39,7 +39,7 @@ LOGIN_SCREEN () {
     ADD_USER_RESULT=$($PSQL "INSERT INTO users(name) VALUES('$USERNAME')")
     
     # Go to game
-    GAME "$USER_ID"
+    GAME "$USER_ID" "$USERNAME" 
 
 
   fi
@@ -52,11 +52,43 @@ LOGIN_SCREEN () {
   echo -e "\nWelcome back, $(echo $USERNAME | sed -E 's/^ *| *$//g')! You have played $(echo $GAMES_PLAYED | sed -E 's/^ *| *$//g') games, and your best game took $(echo $BEST_NUMBER_GUESSES | sed -E 's/^ *| *$//g') guesses."
 
   # Go to game
-  GAME "$USER_ID"
+  GAME "$USER_ID" "$USERNAME"
 }
 
 GAME () {
-echo game
+  USER_ID=$1
+  USERNAME=$2
+  CORRECT=false
+
+
+  # Generate random number between 1 and 1000 
+
+  # Display game message
+
+  # Input while loop
+
+    # Ask for user input
+
+    # If input isn't an integer
+
+      # Print error message
+
+      # Ask for input again
+
+    # If input is higher than number
+
+      # Display appropriate message
+
+      # Ask for input again
+    
+    # Else if input is lower than number
+
+      # Display appropriate message
+
+      # Ask for input again
+
+    # Display congrats message and exit the loop
+
 }
 
 LOGIN_SCREEN "~~~~ Welcome to the number guessing game ~~~~"
