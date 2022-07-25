@@ -58,36 +58,62 @@ LOGIN_SCREEN () {
 GAME () {
   USER_ID=$1
   USERNAME=$2
-  CORRECT=false
+  GUESSES=0
 
 
   # Generate random number between 1 and 1000 
+  NUMBER_TO_GUESS=$(( $RANDOM % 1000 + 1 ))
 
   # Display game message
+  echo -e "\nGuess the secret number between 1 and 1000:"
 
   # Input while loop
+  while true
+  do
+    # Increment number of guesses
+    let "GUESSES++"
 
     # Ask for user input
+    read NUMBER
 
-    # If input isn't an integer
+    # If input isn't an integer 
+    if [[ ! $NUMBER =~ ^[0-9]+$ ]]
+    then 
 
       # Print error message
+      That is not an integer, guess again:
 
       # Ask for input again
+      continue
+    fi
 
     # If input is higher than number
+    if [[ $NUMBER -gt $NUMBER_TO_GUESS ]]
+    then
 
       # Display appropriate message
+      echo -e "\nIt's lower than that, guess again:"
 
       # Ask for input again
-    
+      continue
+    fi
+
     # Else if input is lower than number
+    if [[ $NUMBER -lt $NUMBER_TO_GUESS ]]
+    then
 
       # Display appropriate message
+      echo -e "\nIt's higher than that, guess again:"
 
       # Ask for input again
+      continue
+    fi
 
     # Display congrats message and exit the loop
+    echo -e "\nYou guessed it in $(echo $GUESSES | sed -E 's/^ *| *$//g') tries. The secret number was $(echo $NUMBER_TO_GUESS | sed -E 's/^ *| *$//g'). Nice job!"
+
+    break
+  done
 
 }
 
