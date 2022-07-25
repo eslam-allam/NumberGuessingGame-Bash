@@ -16,15 +16,6 @@ LOGIN_SCREEN () {
   echo -e "\nEnter your username:"
   read USERNAME
 
-  # If username less than 22 characters
-  if [[ ${#USERNAME} -lt 22 ]]
-  then 
-
-    # Return to login with error message
-    LOGIN_SCREEN "\nUsername has to be at least 22 characters"
-    return
-  fi
-
   # Get user_id from database
   USER_ID=$($PSQL "SELECT user_id FROM users WHERE name = '$USERNAME'")
 
